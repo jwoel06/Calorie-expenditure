@@ -1,6 +1,33 @@
 import React from 'react'
 import './Register.css'
+import {useState, useEffect} from "react";
+import {useAuth} from "../hooks/useAuth";
+import {supabase} from "../lib/supabase";
 const Register = () => {
+
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const { register } = useAuth();
+  const handleSignUp = async (e) => {
+    e.preventdefault();
+    setLoading(true);
+    try {
+      const {data, error} = await supabase.auth.signUp({
+        email,
+        password,
+      });
+      setError(error.message);
+    } catch (err) {
+      setError(err.message || 'Failed to Register');
+    }
+    finally {
+      setLoading(false);
+    }
+  }
   
   return (
     <main>

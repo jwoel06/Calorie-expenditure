@@ -1,15 +1,32 @@
 import React from 'react'
 import './Login.css'
-const Login = () => {
-
+import {useState, useEffect} from "react";
+import {useAuth} from "../hooks/useAuth";
+import {supabase} from "../lib/supabase";
+const Login = () => {  
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState('');
-  
+  const [loading, setLoading] = useState(false);
 
+  const { login } = useAuth()
 
+  const handleClick = async (e) => {
+    e.preventDefault(); 
+    setLoading(true);
+    setError(null);
+
+    try {
+      await login(email, password, rememberMe);
+
+    } catch (err) {
+      setError(err.message || 'Login Failed. Please try again');
+    } finally {
+      setLoading(false);
+    }
+    
+  }
   return (
     <main>
       <div className='welcome-container'>
