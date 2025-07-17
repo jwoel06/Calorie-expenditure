@@ -30,7 +30,7 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Features Section */}
+      {/* Features */}
       <section className="features-section">
         <div className="container">
           <h2 className="section-title">Why Choose GoSally?</h2>
@@ -77,7 +77,7 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Stats Section */}
+      {/* Stats */}
       <section className="stats-section">
         <div className="container">
           <div className="stats-grid">
@@ -101,7 +101,7 @@ const Home = () => {
         </div>
       </section>
 
-      {/* CTA Section */}
+      {/* Call-to-action */}
       <section className="cta-section">
         <div className="container">
           <h2>Ready to Start Your Fitness Journey?</h2>
