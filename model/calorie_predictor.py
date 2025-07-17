@@ -5,39 +5,7 @@ from sklearn.preprocessing import StandardScaler
 import joblib
 import copy
 import logging
-from fastapi import FastAPI, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, Field
 from typing import Dict, List, Optional
-
-logging.basicConfig(level=logging.info)
-
-logger = logging.getLogger(__name__)
-
-class CaloriePredictorData(BaseModel):
-    Sex: int = Field(..., description='Gender: 1 for male, 0 = female')
-    Duration: float = Field(..., ge=1, description='Duration of workout is measured in minutes')
-    Temperature: float = Field(..., ge=35, description='Temperature measured in degress celsius, converted on front-end via intensity')
-    Heart_rate: int = Field(..., ge=45, le=220, description='BPM')
-
-class CaloriePredictorResponse(BaseModel):
-    predicted_calories: float
-    input_features: Dict
-    model_info: Dict
-
-# Model Retraining based of user inputted data via option to input their own caloric expenditure
-class TrainingRequest(BaseModel):
-    csv_file_path: str = Field(...)
-
-class TrainingResponse(BaseModel):
-    message: str
-    epochs: int
-    test_mae: float
-
-#Status of model
-class HealthResponseModel(BaseModel):
-    status: str
-    model_loaded: bool
 
 class CaloriePredictor:
     def __init__(self):
@@ -45,22 +13,20 @@ class CaloriePredictor:
         self.female_scaler = StandardScaler()
         self.model = None
         self.feature_columns = None
+        self.model_loaded = False
+        self.last_training_mae = None
     
     def initilaize_dataframe(csv):
         df = pd.read_csv(csv)
         return df
 
     def preprocess_data(self, df):
-        """Clean and preprocess the dataset"""
         df_clean = df.copy()
         
         # Drop unnecessary columns
-        columns_to_drop = ['id', 'Body_Temp']
-        if 'Age' in df_clean.columns:
-            columns_to_drop.extend(['Age', 'Height', 'Weight'])
+        columns_to_drop = ['id', 'Body_Temp','Age', 'Height', 'Weight']
         df_clean.drop(columns_to_drop, axis=1, inplace=True, errors='ignore')
         
-        # Handle Sex column encoding more robustly
         if 'Sex' in df_clean.columns:
             # Convert to string first to handle any mixed types
             df_clean['Sex'] = df_clean['Sex'].astype(str).str.lower().str.strip()
@@ -190,6 +156,8 @@ class CaloriePredictor:
         
         # Evaluate on test set
         test_loss, test_mae = self.model.evaluate(X_test, y_test, verbose=0)
+        self.last_trainnig_mae = test_mae
+        self.model_loaded = True
         print(f"Test MAE: {test_mae:.3f}")
         
         return history
@@ -260,7 +228,8 @@ class CaloriePredictor:
         self.female_scaler = artifacts['female_scaler']
         self.feature_columns = artifacts['feature_columns']
         
-        print("Model and scalers loaded successfully!")
+        print("Model and scalers loaded successfully")
+
 
 # Usage example:
 if __name__ == "__main__":
