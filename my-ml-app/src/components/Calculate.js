@@ -37,21 +37,19 @@ function Calculate() {
     setError(null);
     setResult(null);
 
-    const paylod = {
+    const payload = {
       Sex: formData.sex === 'male' ? 1 : 0, //1 is male 0 is female
       Duration: parseFloat(formData.duration),
       Temperature: convertIntesityToTemperature(formData.intensity),
       Heart_rate: parseInt(formData.heart_rate)
     };
-  };
 
   try {
     const response = await fetch('/api/calculate-calories', { //fast api endpoint
       method:'POST',
       headers: {
-        'Content-type': 'application/json';
-
-      };
+        'Content-type': 'application/json',
+      },
       body: JSON.stringify(payload)
     });
     if (response.ok) {
@@ -71,7 +69,7 @@ function Calculate() {
     finally {
       setLoading(false);
     }
-  }
+  };
   return (
     <div>
       <h1>Estimate Your Calorie Expenditure!</h1>
