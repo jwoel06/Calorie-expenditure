@@ -1,4 +1,4 @@
-from models.calorie_predictor import CaloriePredictor
+from model.calorie_predictor import CaloriePredictor
 from schemas.requests import *
 from schemas.responses import *
 import logging
@@ -16,14 +16,14 @@ class MLService:
             feature_columns = self.predictor.feature_columns
         )
     
-    def make_calorie_prediction(self, request: CaloriePredictonRequest) -> CaloriePredictonResponse:
+    def make_calorie_prediction(self, request: CaloriePredictionRequest) -> CaloriePredictionResponse:
         try:
             # pydantic to dictionary for processing
             input_features = request.model_dump()
 
-            predicted_calories = self.predictor.predict(input_features)
+            predicted_calories = self.predictor.predict_calories(input_features)
 
-            return CaloriePredictonResponse(
+            return CaloriePredictionResponse(
                 predicted_calories = round(predicted_calories, 1),
                 input_features = input_features,
                 model_info = {
@@ -38,15 +38,15 @@ class MLService:
     
     def train_model(self, request: TrainingRequest) -> TrainingResponse:
         try:
-            df = self.predictor.initilaize_dataframe(reqeust.csv_file_path)
+            df = self.predictor.initilaize_dataframe(request.csv_file_path)
 
             result = self.predictor.train(df)
 
             self.predictor.save_model()
 
             return TrainingResponse(
-                message = "Model has been trained successfully"
-                test_mae=result["test_mae"]
+                message = "Model has been trained successfully",
+                test_mae=result["test_mae"],
                 epochs=result['epochs']
             )
             
@@ -56,7 +56,10 @@ class MLService:
 
     def load_existing_model(self):
         try:
-            self.predictor.load_model()
+            self.predictor.load_model(
+                model_path="model/calorie_model.h5", 
+                scaler_path="model/scalers.pkl"
+            )
             return {
                 'message': "Model has loaded successfully"
             }

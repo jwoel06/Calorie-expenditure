@@ -2,7 +2,7 @@ from pydantic import BaseModel, Field
 from typing import Dict, Optional
 
 
-class CaloriePredictonResponse(BaseModel):
+class CaloriePredictionResponse(BaseModel):
     predicted_calories: float
     input_features: Dict
     model_info: Dict

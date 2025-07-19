@@ -20,7 +20,7 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:3000","http://localhost:3001"], #change later for future production
-    allow_creditials=True,
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -29,7 +29,7 @@ ml_service = MLService()
 
 @app.on_event('startup')
 async def startup_event():
-    if os.path.exists("calorie_model.h5") and os.path.exists("scalers.pkl"):
+    if os.path.exists("model/calorie_model.h5") and os.path.exists("model/scalers.pkl"):
         try:
             ml_service.load_existing_model()
         except Exception as e:
@@ -42,10 +42,10 @@ async def health_check():
     return ml_service.get_health_status()
 
 # POST for prediciton
-@app.post('/calculate', response_model=CaloriePredictonResponse)
-async def predict_calories(request: CaloriePredictonRequest):
+@app.post('/api/calculate-calories', response_model=CaloriePredictionResponse)
+async def predict_calories(request: CaloriePredictionRequest):
     try:
-        return ml_service.make_calorie_prediction()
+        return ml_service.make_calorie_prediction(request)
     except Exception as e:
         raise HTTPException(status_code= 500, description=f'Prediction failed: {e}')
 

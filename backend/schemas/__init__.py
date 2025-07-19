@@ -1,23 +1,23 @@
 
-from .requests import {
+from .requests import (
     CaloriePredictionRequest,
     TrainingRequest
-}
+)
 
-from .responses import {
-    CaloriePredictonResponse,
+from .responses import (
+    CaloriePredictionResponse,
     TrainingResponse,
-    HealthResponseModel,
+    HealthCheckResponse,
     ErrorResponse
-}
+)
 
 __all__ = {
     #Requests
     CaloriePredictionRequest,
     TrainingRequest,
     #Responses
-    CaloriePredictonResponse,
+    CaloriePredictionResponse,
     TrainingResponse,
-    HealthResponseModel,
+    HealthCheckResponse,
     ErrorResponse
 }
