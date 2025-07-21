@@ -36,9 +36,12 @@ main {
 .login-items label{
     font-weight: bold;
     font-size: 18px;
+    color: white; 
 }
 
-.login-items input {
+
+.login-items input[type="email"],
+.login-items input[type="password"] {
     width: 450px;
     height: 40px;
     padding: 20px;
@@ -47,7 +50,17 @@ main {
     font-size: 14px;
     background-color: white;
     margin-left: 2px;
-    margin-bottom: 12px;
+    margin-bottom: 4px;
+}
+
+/* checkbox */
+.login-items input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    margin-right: 10px;
+    padding: 0;
+    cursor: pointer;
 }
 
 .login-items button {
@@ -63,17 +76,27 @@ main {
 }
 
 .login-items button:hover {
-    background-color: rgb(92, 0, 110);
-    
+    background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
 }
 
-.remember-me input{
-    width: 24px;
-    height: 16px;
+.remember-me {
+    display: flex;
+    align-items: center;
+    margin: 10px 0;
+    width: 100%;
+}
+
+.remember-me label {
+    font-size: 14px;
+    color: white;
+    cursor: pointer;
+    margin: 0;
+    padding: 0;
+    width: auto;
+    height: auto;
 }
 
 /*Welcome Content */
-
 .welcome-container {
     width: 500px;
     height: 650px;
@@ -83,4 +106,50 @@ main {
     align-items: center;
     padding: 64px;
     margin-right: 16px;
+}
+
+.welcome-title {
+    color: white;
+    text-align: center;
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.welcome-content {
+    color: white;
+    text-align: center;
+    font-size: 1.2rem;
+    line-height: 1.5;
+}
+
+/* Form field styling */
+.form-field {
+    margin-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.error-message {
+    background-color: #fee;
+    color: #c33;
+    padding: 0.5rem;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+    border: 1px solid #fcc;
+    font-size: 14px;
+}
+
+.loading {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+input:disabled {
+    opacity: 0.6;
 }
