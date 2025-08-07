@@ -12,7 +12,7 @@ class CaloriePredictor:
         self.male_scaler = StandardScaler()
         self.female_scaler = StandardScaler()
         self.model = None
-        self.feature_columns = None
+        self.feature_columns = ['Sex', 'Duration', 'Heart_Rate', 'Body_Temp']
         self.model_loaded = False
         self.last_training_mae = None
     
@@ -24,14 +24,13 @@ class CaloriePredictor:
         df_clean = df.copy()
         
         # Drop unnecessary columns
-        columns_to_drop = ['id', 'Body_Temp','Age', 'Height', 'Weight']
+        columns_to_drop = ['id']
         df_clean.drop(columns_to_drop, axis=1, inplace=True, errors='ignore')
         
         if 'Sex' in df_clean.columns:
             # Convert to string first to handle any mixed types
             df_clean['Sex'] = df_clean['Sex'].astype(str).str.lower().str.strip()
             
-            # Map values
             df_clean['Sex'] = df_clean['Sex'].map({'male': 1, 'female': 0, 'm': 1, 'f': 0})
             
             # Check for any unmapped values
@@ -41,7 +40,6 @@ class CaloriePredictor:
                 # Fill with most common value or drop
                 df_clean['Sex'].fillna(df_clean['Sex'].mode()[0], inplace=True)
         
-        # Convert all columns to numeric, coercing errors to NaN
         numeric_columns = []
         for col in df_clean.columns:
             if col != 'Sex':  # Sex is already handled
@@ -77,10 +75,12 @@ class CaloriePredictor:
     
     def prepare_data(self, df, target_column='Calories'):
         """Split features and target, with proper reshaping"""
-        feature_columns = [c for c in df.columns if c != target_column]
-        self.feature_columns = feature_columns
+        required_features = ['Sex', 'Duration', 'Heart_Rate', 'Body_Temp']
+        missing_cols = [col for col in required_features if col not in df.columns]
+        if missing_cols:
+            raise ValueError(f"Missing Required Columns: {missing_cols}")
         
-        X = df[feature_columns].values
+        X = df[required_features].values
         y = df[target_column].values.reshape(-1, 1)
         
         return X, y
@@ -172,12 +172,13 @@ class CaloriePredictor:
         
         # Convert input to DataFrame for consistency
         if isinstance(input_features, dict):
-            input_df = pd.DataFrame([input_features])
-        else:
-            input_df = pd.DataFrame(input_features, columns=self.feature_columns)
-        
-        # Ensure correct column order
-        input_array = input_df[self.feature_columns].values
+            # Ensure correct column order
+            input_array = np.array([[
+                input_features['Sex'],
+                input_features['Duration'],
+                input_features['Heart_Rate'],
+                input_features['Body_Temp']
+            ]])
         
         # Get normalized prediction
         prediction_normalized = self.model.predict(input_array, verbose=0)
@@ -190,7 +191,7 @@ class CaloriePredictor:
             prediction_sqrt = self.male_scaler.inverse_transform(prediction_normalized)
             # Undo square root
             prediction_calories = prediction_sqrt ** 2
-        else:  # Female
+        else:  
             # Undo StandardScaler  
             prediction_sqrt = self.female_scaler.inverse_transform(prediction_normalized)
             # Undo square root
@@ -237,46 +238,10 @@ if __name__ == "__main__":
     predictor = CaloriePredictor()
     
     # Load your data
-    df = pd.read_csv('model/train_calories.csv')
+    df = pd.read_csv('backend/model/train_calories.csv')
     
     # Train the model
     history = predictor.train(df)
     
     # Save the model
     predictor.save_model()
-
-    test_cases = [
-        {
-            "name": "Male - Moderate Workout",
-            "input": {'Sex': 1, 'Duration': 30, 'Heart_Rate': 140},
-        },
-        {
-            "name": "Male - Intense Workout", 
-            "input": {'Sex': 1, 'Duration': 45, 'Heart_Rate': 170},
-        },
-        {
-            "name": "Female - Light Workout",
-            "input": {'Sex': 0, 'Duration': 20, 'Heart_Rate': 120},
-        },
-        {
-            "name": "Female - Moderate Workout",
-            "input": {'Sex': 0, 'Duration': 35, 'Heart_Rate': 150},
-        },
-        {
-            "name": "Male - Long Cardio",
-            "input": {'Sex': 1, 'Duration': 60, 'Heart_Rate': 130},
-        }
-    ]
-    
-    for test in test_cases:
-        try:
-            prediction = predictor.predict_calories(test["input"])
-            print(f"\n {test['name']}:")
-            print(f"   Input: {test['input']}")
-            print(f"   Predicted Calories: {prediction:.1f}")
-        except Exception as e:
-            print(f"Error with {test['name']}: {e}")
-    
-    print(f"\n Training completed! Model expects features: {predictor.feature_columns}")
-    print(" Model files saved: calorie_model.h5 and scalers.pkl")
-    print(" Ready for production use!")

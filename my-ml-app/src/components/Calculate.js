@@ -29,7 +29,7 @@ function Calculate() {
       'high': 39.0,
       'very_high': 40.5
     };
-    return intensityMap[intensity] || 36.0;
+    return intensityMap[intensity];
   };
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -40,8 +40,8 @@ function Calculate() {
     const payload = {
       Sex: formData.sex === 'male' ? 1 : 0, //1 is male 0 is female
       Duration: parseFloat(formData.duration),
+      Heart_Rate: parseInt(formData.heart_rate),
       Body_Temp: convertIntesityToTemperature(formData.intensity),
-      Heart_Rate: parseInt(formData.heart_rate)
     };
 
   try {
@@ -93,7 +93,6 @@ function Calculate() {
               <option value="female">Female</option>
             </select>
           </div>
-  
           <div className="input-group">
             <label htmlFor="duration" className="input-label">Length Of Workout (minutes)</label>
             <input 
@@ -104,7 +103,7 @@ function Calculate() {
               onChange={handleChange}
               required
               min="1"
-              step="0.1"
+              step="1"
               className="input-field"
               placeholder="Enter workout duration"
             />

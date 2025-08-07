@@ -1,6 +1,7 @@
 import React from 'react'
 import './Register.css'
 import {useState, useEffect} from "react";
+import { useNavigate } from 'react-router-dom';
 import {useAuth} from "../hooks/useAuth";
 import {supabase} from "../lib/supabase";
 const Register = () => {
@@ -13,7 +14,9 @@ const Register = () => {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState('');
 
-  const { register } = useAuth();
+  const { signUp } = useAuth();
+
+  const navigate = useNavigate();
 
   const handleSignUp = async (e) => {
     e.preventDefault();
@@ -37,28 +40,52 @@ const Register = () => {
     }
 
     try {
-      const {data, error} = await supabase.auth.signUp({
-        email,
-        password,
-      });
-      if (error) {
-        setSuccess('Registration successful! Please check your email to confirm your account.');
-        // Clear form
-        setEmail('');
-        setPassword('');
-        setConfirmPassword('');
-        setAgreeTerms(false);
+      const result = await signUp(email,password);
+
+      console.log('Session: ', result.data?.session);
+      
+      if (!result.success) {
+        setError(result.error);
+        setLoading(false);
+        return;
+      } 
+
+      const authData = result.data
+        if (authData?.user) {
+          console.log('User ID exists:', authData.user.id);  // This will show the ID!
+          console.log('Trying to insert:', {
+            id: authData.user.id,  // This has a value!
+            email: email
+          });
+        }
+        const profileError = false
+        if (profileError) { // add other measures later
+            console.error('Profile creation failed but user was signed up')
+          }
+        else {
+          setSuccess('Registration successful! Please check your email to confirm your account.');
+
+          localStorage.setItem('pendingUserId',authData.user.id);
+          // Clear form
+          setEmail('');
+          setPassword('');
+          setConfirmPassword('');
+          setAgreeTerms(false);
+
+          setTimeout(()=> {
+            navigate('/confirmation');
+          }, 2000);
+        }
       }
-      else {
-        setSuccess('')
-      }
-    } catch (err) {
+
+    catch (err) {
       setError(err.message || 'Failed to Register');
     }
     finally {
       setLoading(false);
     }
   }
+
   
   return (
     <main>

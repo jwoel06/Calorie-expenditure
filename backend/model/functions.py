@@ -6,7 +6,7 @@ from typing import Dict, List, Union, Optional
 import os
 
 class CaloriePredictorExecutor:
-    def __init__(self, model_path: str="model/calorie_model.h5", scaler_path: str="model/scalers.pkl"):
+    def __init__(self, model_path: str="backend/model/calorie_model.h5", scaler_path: str="backend/model/scalers.pkl"):
         """
         Constructor for calorie predictor class
 
@@ -96,7 +96,8 @@ class CaloriePredictorExecutor:
                 ex: {
                 'Sex': 'male',
                 'Duration': 30,
-                'Heart_Rate': 150
+                'Heart_Rate': 150,
+                'Body_Temp': 40
                 }
         Returns:
         

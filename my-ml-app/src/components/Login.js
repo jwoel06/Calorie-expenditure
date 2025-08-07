@@ -3,6 +3,8 @@ import './Login.css'
 import {useState, useEffect} from "react";
 import {useAuth} from "../hooks/useAuth";
 import {supabase} from "../lib/supabase";
+import {useNavigation} from 'react-router-dom';
+
 const Login = () => {  
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -11,6 +13,7 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
 
   const { login } = useAuth()
+  const navigate = useNavigation();
 
   const handleClick = async (e) => {
     e.preventDefault(); 
@@ -25,8 +28,8 @@ const Login = () => {
     } finally {
       setLoading(false);
     }
-    
-  }
+  };
+
   return (
     <main>
       <div className='welcome-container'>

@@ -7,7 +7,6 @@ class CaloriePredictionResponse(BaseModel):
     input_features: Dict
     model_info: Dict
 
-
 class TrainingResponse(BaseModel):
     message: str
     epochs: int

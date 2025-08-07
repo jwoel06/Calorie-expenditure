@@ -5,6 +5,8 @@ import Login from './components/Login';
 import Register from './components/Register';
 import Calculate from './components/Calculate';
 import Home from './components/Home'
+import Survey from './components/Survey'
+import ConfirmEmail from './components/ConfirmEmail'
 
 function App() {
   return (
@@ -30,6 +32,8 @@ function App() {
           <Route path="/calculate" element={<Calculate />} />
           <Route path="/login" element={<Login/>} />
           <Route path="/register" element={<Register />} />
+          <Route path="/survey" element={<Survey />} />
+          <Route path="/confirmation" element={<ConfirmEmail/>} />
         </Routes>
       </div>
     </Router>
